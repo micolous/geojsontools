@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+"""
+Finds the differences in points between two GeoJSON files
+Copyright 2014 Michael Farrell <http://micolous.id.au>
+
+License: 3-clause BSD, see COPYING
+"""
 
 import geojson, argparse
 
@@ -48,7 +54,7 @@ def main():
 	
 	parser.add_argument('-O', '--original', required=True, type=argparse.FileType('rb'), help='Original file')
 	parser.add_argument('-N', '--new', required=True, type=argparse.FileType('rb'), help='New file')
-	parser.add_argument('-i', '--id-field', required=True, default='id', help='Field to check for when watching points that have changed')
+	parser.add_argument('-i', '--id-field', required=True, default='id', help='Field to check for when watching points that have changed  (default: %(default)s)')
 	
 	parser.add_argument('-n', '--new-points', required=True, type=argparse.FileType('wb'), help='Where to write new points')
 	parser.add_argument('-d', '--deleted-points', required=True, type=argparse.FileType('wb'), help='Where to write deleted points')
