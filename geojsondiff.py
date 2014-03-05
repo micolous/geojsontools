@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """
+geojsondiff
 Finds the differences in points between two GeoJSON files
 Copyright 2014 Michael Farrell <http://micolous.id.au>
 
