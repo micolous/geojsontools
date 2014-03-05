@@ -24,8 +24,8 @@ For example, you might have a JSON file like this:
 
 ```json
 [
-	{"lat": -34.99, "long": 138.51, "name": "A"},
-	{"lat": -35.04, "long": 138.42, "name": "B"}
+	{"lat": -34.93, "long": 138.60, "name": "Adelaide"},
+	{"lat": -37.81, "long": 144.95, "name": "Melbourne"}
 ]
 ```
 
@@ -46,31 +46,25 @@ And becomes:
     "features": [
         {
             "geometry": {
-                "coordinates": [
-                    138.51,
-                    -34.99
-                ],
+                "coordinates": [138.6, -34.93],
                 "type": "Point"
             },
-            "id": "7d9f10b7-1d95-464e-ad68-2f9859912151",
+            "id": "3245acc2-5d3a-43b3-9ecb-6e49ca763622",
             "properties": {
-                "name": "A",
-                "uuid": "7d9f10b7-1d95-464e-ad68-2f9859912151"
+                "name": "Adelaide",
+                "uuid": "3245acc2-5d3a-43b3-9ecb-6e49ca763622"
             },
             "type": "Feature"
         },
         {
             "geometry": {
-                "coordinates": [
-                    138.42,
-                    -35.04
-                ],
+                "coordinates": [144.95, -37.81],
                 "type": "Point"
             },
-            "id": "1e8b5fd0-7363-4272-9279-ac1c0ab0b5b3",
+            "id": "a4fb85ce-42a5-4a68-9150-2ece4cd6ce18",
             "properties": {
-                "name": "B",
-                "uuid": "1e8b5fd0-7363-4272-9279-ac1c0ab0b5b3"
+                "name": "Melbourne",
+                "uuid": "a4fb85ce-42a5-4a68-9150-2ece4cd6ce18"
             },
             "type": "Feature"
         }
