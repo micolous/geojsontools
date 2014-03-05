@@ -24,8 +24,8 @@ For example, you might have a JSON file like this:
 
 ```json
 [
-	{'lat': -34.99, 'long': 138.51, 'name': 'A'},
-	{'lat': -35.04, 'long': 138.42, 'name': 'B'}
+	{"lat": -34.99, "long": 138.51, "name": "A"},
+	{"lat": -35.04, "long": 138.42, "name": "B"}
 ]
 ```
 
