@@ -16,7 +16,7 @@ $ python geojsondiff.py -O points-2013.geojson -N points-2014.geojson -n AddedPo
 
 Given a JSON file with a list of points in it, convert to a GeoJSON file.
 
-This assumes that the input file is in the WGS84 datum.  It reads latitude and longitude from a field like `lat`/`lon`/`lng`, and handles factorials (where fields are specified like `latE3`).
+This assumes that the input file is in the WGS84 datum.  It reads latitude and longitude from a field like `lat`/`lon`/`lng`, and handles scientific notation (where fields are specified like `latE3`).
 
 Other properties on points in the GeoJSON file are made available as properties on the `Feature`.
 

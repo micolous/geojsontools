@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """
 geojsonify
-Given a JSON file with a simple list of points, convert to a GeoJSON file.  Assumes WGS84 datum, optionally supports factorial lat/long (like Google Maps API).
+Given a JSON file with a simple list of points, convert to a GeoJSON file.  Assumes WGS84
+datum, optionally supports scientific notation lat/long ("E", like Google Maps API).
+
 Copyright 2014 Michael Farrell <http://micolous.id.au>
 
 License: 3-clause BSD, see COPYING
@@ -40,7 +42,7 @@ def geojsonifyme(input_f, output_f):
 	if id_key is None:
 		print >> sys.stderr, "Warning: `id` field not found in source file. Will generate GUIDs automatically instead."
 
-	# we have some candidates, lets find out if they're raw or factorial
+	# we have some candidates, lets find out if they're raw or scientific notation
 	lat_factor = long_factor = 1
 	if 'E' in lat_key:
 		# this is a factorial, parse it
