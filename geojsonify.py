@@ -45,7 +45,7 @@ def geojsonifyme(input_f, output_f):
 	# we have some candidates, lets find out if they're raw or scientific notation
 	lat_factor = long_factor = 1
 	if 'E' in lat_key:
-		# this is a factorial, parse it
+		# this is a scientific, parse it
 		lat_factor = lat_key.split('E', 2)[1]
 		lat_factor = 10 ** int(lat_factor)
 
