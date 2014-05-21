@@ -127,12 +127,11 @@ def gtfs_routes(routes_f, shapes_f, trips_f, output_f):
 				coordinates=trips[row[route_id_col]]
 			),
 			properties=props,
-			id=row[route_id_col]	
+			id=row[route_id_col]
 		))
 
 	# now flush the GeoJSON layer to a file.
 	geojson.dump(output_layer, output_f)
-
 
 
 def main():

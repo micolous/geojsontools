@@ -90,3 +90,20 @@ For example, a LineString in one file with the same ID as a Point in another fil
 ```
 $ python geojsonmerge.py -o all.geojson -i guid regions/*.geojson
 ```
+
+## gtfs2geojson ##
+
+Converts data from Google Transit Feed Specification (GTFS) format into GeoJSON format.
+
+This tool can transform routes (using `routes.txt`, `shapes.txt` and `trips.txt`) into a collection of LineStrings, and transform stops (using `stops.txt`) into a collection of Points.
+
+For example:
+
+```console
+$ wget http://adelaidemetro.com.au/GTFS/google_transit.zip
+$ mkdir metro
+$ cd metro
+$ unzip ../google_transit.zip
+$ python ../gtfs2geojson.py -o Metro-routes.geojson -r routes.txt -s shapes.txt -t trips.txt
+$ python ../gtfs2geojson.py -o Metro-stops.geojson -p stops.txt
+```
