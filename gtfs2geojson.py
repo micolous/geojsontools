@@ -100,7 +100,7 @@ def gtfs_routes(routes_f, shapes_f, trips_f, output_f):
 	route_id_col = header.index('route_id')
 	shape_id_col = header.index('shape_id')
 	for row in trips_c:
-		if row[route_id_col] in trips:
+		if row[route_id_col] in trips and len(trips[row[route_id_col]]) > len(shapes[row[shape_id_col]]):
 			continue
 
 		trips[row[route_id_col]] = shapes[row[shape_id_col]]
