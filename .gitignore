@@ -1,0 +1,19 @@
+# Python bytecode + editor junk
+*.pyc
+*.pyo
+*~
+
+# Other things which I tend to litter my working copy with, mostly
+# GIS database files.
+*.geojson
+*.json
+*.txt
+*.shp
+*.prj
+*.qpj
+*.shx
+*.dbf
+*.osm
+*.cpg
+
+

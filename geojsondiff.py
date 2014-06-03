@@ -9,14 +9,14 @@ License: 3-clause BSD, see COPYING
 
 import geojson, argparse
 
-def loadpoints(layer):
+def loadpoints(layer, id_field):
 	points = {}
 	for point in layer:
 		if point.geometry.type != 'Point':
 			continue
 		
 		# we have a point, load it up
-		points[point.properties['guid']] = point
+		points[point.properties[id_field]] = point
 	
 	return points
 
@@ -24,15 +24,17 @@ def loadpoints(layer):
 def diffme(original_file, new_file, new_points_f, deleted_points_f, id_field):
 	original = geojson.load(original_file)
 	new = geojson.load(new_file)
-	
+
 	# Load all the points into a dict
-	original_layer = loadpoints(original.features)
-	new_layer = loadpoints(new.features)
-	
+	original_layer = loadpoints(original.features, id_field)
+	new_layer = loadpoints(new.features, id_field)
+
+	# TODO: Check that CRS is identical.
+
 	# Find all the points that were added
 	original_guids = set(original_layer.keys())
 	new_guids = set(new_layer.keys())
-	
+
 	added_guids = new_guids - original_guids
 	new_points = geojson.FeatureCollection([])
 	new_points.crs = new.crs
