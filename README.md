@@ -6,7 +6,7 @@ These typically focus on small utilities in order to convert data between differ
 
 ## geojson2osm ##
 
-Converts a GeoJSON file containing points into OpenStreetMap XML format.
+Converts a GeoJSON file containing points into OpenStreetMap XML format.  This does not convert other types of geometry, and data from this tool will violate OSM's metadata schemas.  It is designed to target a subset for use by rendering and routing applications.
 
 For example, you may have a GeoJSON file containing a list of geocaches in your area which you wish to use with an application that uses OSM XML format:
 
