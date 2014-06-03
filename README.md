@@ -2,7 +2,25 @@
 
 Some small tools to work with GeoJSON files, using the [python-geojson](https://github.com/frewsxcv/python-geojson) library.
 
-These typically focus on small utilities in order to convert data between different formats, or perform operations that are difficult or impossible to do inside of software like `ogr2ogr` or QGIS.
+These typically focus on small utilities in order to convert data between different formats, or perform operations that are difficult or impossible to do inside of software like `gpsbabel`, `ogr2ogr` or QGIS.
+
+## geojson2osm ##
+
+Converts a GeoJSON file containing points into OpenStreetMap XML format.
+
+For example, you may have a GeoJSON file containing a list of geocaches in your area which you wish to use with an application that uses OSM XML format:
+
+```console
+$ python geojson2osm.py -n cache_name geocaches-2014-06-01.geojson -o geocaches-pre-2014-06-01.osm
+```
+
+You can then annotate these points appropriately with a tool like `gpsbabel`, by having a user-defined point type to select on.
+
+```console
+$ gpsbabel -i osm -f geocaches-pre-2014-06-01.osm -o osm,tagnd="user_defined:geocache",created_by -F geocaches-2014-06-01.osm
+```
+
+And then this file can be used with other map creation software or tile renderers that read OSM XML format.
 
 ## geojsondiff ##
 
@@ -10,7 +28,7 @@ Finds added and deleted points in two GeoJSON files.  Other types of geometry ar
 
 This matches points based on the `id` field by default, however may be changed to use other fields instead. (`-i`)
 
-```
+```console
 $ python geojsondiff.py -O points-2013.geojson -N points-2014.geojson -n AddedPoints.geojson -d DeletedPoints.geojson
 ```
 
