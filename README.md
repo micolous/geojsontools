@@ -135,7 +135,9 @@ Converts data from [Google Transit Feed Specification (GTFS)](https://developers
 
 This tool can transform routes (using `routes.txt`, `shapes.txt` and `trips.txt`) into a collection of LineStrings, and transform stops (using `stops.txt`) into a collection of Points.
 
-For routes, in the case that multiple shapes exist for the same route, this tool will select the shape with the most points.  This particularly applies to services which start or finish prematurely -- the longer route will always be shown instead.
+For routes, in the case that multiple shapes exist for the same route, this tool will select the shape that has the most references in `trips.txt`.  This can mean that a more-frequent shortened route with the same route number as a longer route can sometimes display instead of the longer route.  This was selected as sometimes geometries are broken for routes with more points.
+
+The `shape_id` and number of references it had is included as properties in the output GeoJSON geometries (as `shape_id` and `shape_refs` to aid debugging bad source data.
 
 Google [has a list of transit authorities that provide GTFS data](https://code.google.com/p/googletransitdatafeed/wiki/PublicFeeds).  Most authorities provide this freely to anyone without registration, while others require registration and a license agreement be signed and returned to them.
 
@@ -149,4 +151,34 @@ $ unzip ../google_transit.zip
 $ python ../gtfs2geojson.py -o AdelaideMetro-routes.geojson -r routes.txt -s shapes.txt -t trips.txt
 $ python ../gtfs2geojson.py -o AdelaideMetro-stops.geojson -p stops.txt
 ```
+
+### marking up gtfs-converted data ###
+
+This can then be marked up with some various rules in QGIS.  For colours, use a data defined property like:
+
+```
+CONCAT('#', "route_color")
+```
+
+This will add a `#` character to the start of the colours so that Qt will recognise the hexadecimal colours from `routes.txt` correctly.
+
+For labels, use a data defined property like this, in order to add Unicode icons for each of the transport types.  Note that you'll require Unicode 6.0 support and a font that includes the "Transport and Map Symbols" block.
+
+```
+CONCAT((CASE 
+WHEN "route_type" = '0' THEN '🚊'
+WHEN "route_type" = '1' THEN '🚇'
+WHEN "route_type" = '2' THEN '🚆'
+WHEN "route_type" = '3' THEN '🚍'
+WHEN "route_type" = '4' THEN '🚢'
+WHEN "route_type" = '5' THEN '🚃'
+WHEN "route_type" = '6' THEN '🚟'
+WHEN "route_type" = '7' THEN '🚞'
+END), ' ', "route_id")
+```
+
+After some other minor tweaks, QGIS will give you output that looks like this:
+
+![Adelaide Metro route map](/examples/adelaidemetro.png?raw=true)
+
 

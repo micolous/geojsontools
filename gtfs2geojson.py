@@ -95,15 +95,35 @@ def gtfs_routes(routes_f, shapes_f, trips_f, output_f):
 
 	# Make a matching dict between routes and shapes
 	trips = {}
+	trips_ref = {}
 	trips_c = csv.reader(trips_f)
 	header = trips_c.next()
 	route_id_col = header.index('route_id')
 	shape_id_col = header.index('shape_id')
 	for row in trips_c:
-		if row[route_id_col] in trips and len(trips[row[route_id_col]]) > len(shapes[row[shape_id_col]]):
-			continue
+		# reference count the shapes
+		if row[route_id_col] not in trips_ref:
+			# route is unknown, create dict
+			trips_ref[row[route_id_col]] = {}
 
-		trips[row[route_id_col]] = shapes[row[shape_id_col]]
+		if row[shape_id_col] not in trips_ref[row[route_id_col]]:
+			# shape is unknown, create counter
+			trips_ref[row[route_id_col]][row[shape_id_col]] = 0
+
+		# increment counter
+		trips_ref[row[route_id_col]][row[shape_id_col]] += 1
+
+	# now we're done, iterate through the reference-counters and find the best
+	# shape
+	for route_id, candidate_shapes in trips_ref.iteritems():
+		popular_shape, popular_shape_refs = None, 0
+		for shape_id, refs in candidate_shapes.iteritems():
+			if refs > popular_shape_refs:
+				popular_shape, popular_shape_refs = shape_id, refs
+
+		# now we should have the route's shape
+		assert popular_shape is not None, 'Couldn\'t find a shape for route %r' % route_id
+		trips[route_id] = popular_shape
 
 	# lets setup our output file
 	output_layer = geojson.FeatureCollection([])
@@ -121,10 +141,13 @@ def gtfs_routes(routes_f, shapes_f, trips_f, output_f):
 		for i, h in enumerate(header):
 			if row[i] != '':
 				props[h] = row[i]
-		
+
+		props['shape_id'] = trips[row[route_id_col]]
+		props['shape_refs'] = trips_ref[row[route_id_col]][props['shape_id']]
+
 		output_layer.features.append(geojson.Feature(
 			geometry=geojson.LineString(
-				coordinates=trips[row[route_id_col]]
+				coordinates=shapes[trips[row[route_id_col]]]
 			),
 			properties=props,
 			id=row[route_id_col]
