@@ -174,7 +174,11 @@ WHEN "route_type" = '4' THEN '🚢'
 WHEN "route_type" = '5' THEN '🚃'
 WHEN "route_type" = '6' THEN '🚟'
 WHEN "route_type" = '7' THEN '🚞'
-END), ' ', "route_id")
+END), ' ', CASE
+WHEN "route_short_name" THEN "route_short_name"
+ELSE "route_long_name"
+END
+)
 ```
 
 After some other minor tweaks, QGIS will give you output that looks like this:
