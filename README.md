@@ -119,14 +119,18 @@ Note: This doesn't compare changes in geometry between the versions.
 
 Merges multiple GeoJSON files' geometries into a single GeoJSON file.
 
-This matches geometries (not just points) based on the `id` field by default, however may be adapted to use a different field instead.
+This can behave in several ways:
 
-This supports all types of geometries, not just points.  The `id` field must be unique across all files and all geometry types.
+- Add all geometries in with no regard for duplicates. (`-n`)
+- Match by the "id" field in the geometry. (`-i`)
+- Match by a particular property of the geometry. (`-f id`)
+
+This supports all types of geometries, not just points.  The chosen field must be unique across all files and all geometry types.
 
 For example, a LineString in one file with the same ID as a Point in another file, these would be treated as the same geometry and only the first geometry would be included in the output file.
 
 ```console
-$ python geojsonmerge.py -o all.geojson -i guid regions/*.geojson
+$ python geojsonmerge.py -o all.geojson -f guid regions/*.geojson
 ```
 
 ## gtfs2geojson ##
