@@ -133,6 +133,14 @@ For example, a LineString in one file with the same ID as a Point in another fil
 $ python geojsonmerge.py -o all.geojson -f guid regions/*.geojson
 ```
 
+## geojsonpropertyfilter ##
+
+Removes all properties from GeoJSON features except those specified.
+
+```console
+$ python geojsonpropertyfilter.py -o filtered.geojson raw.geojson name
+```
+
 ## gtfs2geojson ##
 
 Converts data from [Google Transit Feed Specification (GTFS)](https://developers.google.com/transit/gtfs/) format into GeoJSON format.
