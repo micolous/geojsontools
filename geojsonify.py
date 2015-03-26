@@ -4,7 +4,7 @@ geojsonify
 Given a JSON file with a simple list of points, convert to a GeoJSON file.  Assumes WGS84
 datum, optionally supports scientific notation lat/long ("E", like Google Maps API).
 
-Copyright 2014 Michael Farrell <http://micolous.id.au>
+Copyright 2014-2015 Michael Farrell <http://micolous.id.au>
 
 License: 3-clause BSD, see COPYING
 """
@@ -17,7 +17,7 @@ def geojsonifyme(input_f, output_f):
 	input_obj = simplejson.load(input_f, use_decimal=True)
 	output_layer = geojson.FeatureCollection([])
 	# assume WGS84 CRS
-	output_layer.crs = geojson.crs.Named('urn:ogc:def:crs:OGC:1.3:CRS84')
+	output_layer.crs = geojson.crs.Named(properties=dict(name='urn:ogc:def:crs:OGC:1.3:CRS84'))
 	
 	# load what the fields in this array are
 	first_keys = set(input_obj[0].keys())
