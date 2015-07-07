@@ -211,6 +211,33 @@ def gtfs_routes(routes_f, shapes_f, trips_f, stoptimes_f, output_f):
 	geojson.dump(output_layer, output_f)
 
 
+def swallow_windows_unicode(fileobj, rewind=True):
+	"""
+	Windows programs (specifically, Notepad) puts '\xef\xbb\xbf' at the start of
+	a Unicode text file.  This is used to handle "utf-8-sig" files.
+
+	This function looks for those bytes and advances the stream past them if
+	they are present.
+
+	Returns fileobj, fast-forwarded past the characters.
+	"""
+	if rewind:
+		pos = fileobj.tell()
+
+	try:
+		bom = fileobj.read(3)
+	except:
+		# End of file, revert!
+		fileobj.seek(pos)
+	if bom == '\xef\xbb\xbf':
+		return fileobj
+
+	# Bytes not present, rewind the stream
+	if rewind:
+		fileobj.seek(pos)
+	return fileobj
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	
@@ -254,9 +281,9 @@ def main():
 		assert options.trips
 		assert options.stop_times
 
-		gtfs_routes(options.routes, options.shapes, options.trips, options.stop_times, options.output)
+		gtfs_routes(swallow_windows_unicode(options.routes), swallow_windows_unicode(options.shapes), swallow_windows_unicode(options.trips), swallow_windows_unicode(options.stop_times), options.output)
 	elif options.stops and not options.routes:
-		gtfs_stops(options.stops, options.output)
+		gtfs_stops(swallow_windows_unicode(options.stops), options.output)
 	else:
 		print 'invalid options combination'
 
