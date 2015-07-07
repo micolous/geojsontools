@@ -194,6 +194,11 @@ def gtfs_routes(routes_f, shapes_f, trips_f, stoptimes_f, output_f):
 			if row[i] != '':
 				props[h] = row[i]
 
+		if row[route_id_col] not in trips:
+			# Route has no trips!
+			print "Warning: route has no trips, skipping: %r" % (row,)
+			continue
+
 		props['shape_id'] = trips[row[route_id_col]]
 		props['shape_refs'] = trips_ref[row[route_id_col]][props['shape_id']]
 		props['shape_length'] = shape_lengths[props['shape_id']]
