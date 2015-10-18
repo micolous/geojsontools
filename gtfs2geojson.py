@@ -11,14 +11,14 @@ import geojson, argparse, csv, zipfile
 from datetime import timedelta
 from decimal import Decimal
 
-def gtfs_stops(stops_f, output_f):
+def gtfs_stops(gtfs, output_f):
 	"""
 	For each stop, convert it into a GeoJSON Point, and make all of it's attributes available.
 	
-	:param stops_f file: Input 'stops.txt' file from the GTFS feed.
+	:param gtfs file: Input GTFS ZIP.
 	:param output_f file: Output GeoJSON file stream.
 	"""
-	stops_c = csv.reader(gtfs.open('stops.txt', 'r'))
+	stops_c = csv.reader(swallow_windows_unicode(gtfs.open('stops.txt', 'r')))
 
 	output_layer = geojson.FeatureCollection([])
 	# assume WGS84 CRS
@@ -64,16 +64,13 @@ def gtfs_routes(gtfs, output_f):
 	For each route, convert it's 'shape' into a GeoJSON LineString, and make all
 	of it's attributes available.
 	
-	:param routes_f file: Input 'routes.txt' file from the GTFS feed.
-	:param shapes_f file: Input 'shapes.txt' file from the GTFS feed.
-	:param trips_f file: Input 'trips.txt' file from the GTFS feed.
-	:param stoptimes_f file: Input 'stop_times.txt' file from the GTFS feed.
+	:param gtfs file: Input GTFS ZIP
 	:param output_f file: Output GeoJSON file stream.
 	
 	"""
 	
 	# Load up the stop times so we can find which are the best routes.
-	stoptimes_c = csv.reader(gtfs.open('stop_times.txt', 'r'))
+	stoptimes_c = csv.reader(swallow_windows_unicode(gtfs.open('stop_times.txt', 'r')))
 	header = stoptimes_c.next()
 	trip_id_col = header.index('trip_id')
 	arrtime_col = header.index('arrival_time')
@@ -105,7 +102,7 @@ def gtfs_routes(gtfs, output_f):
 	# Load the shapes into a map that we can lookup.
 	# We should do all the geometry processing here so that we only have to do
 	# this once-off.
-	shapes_c = csv.reader(gtfs.open('shapes.txt', 'r'))
+	shapes_c = csv.reader(swallow_windows_unicode(gtfs.open('shapes.txt', 'r')))
 
 	header = shapes_c.next()
 	shape_id_col = header.index('shape_id')
@@ -144,7 +141,7 @@ def gtfs_routes(gtfs, output_f):
 	trips_ref = {}
 	route_time = {}
 
-	trips_c = csv.reader(gtfs.open('trips.txt', 'r'))
+	trips_c = csv.reader(swallow_windows_unicode(gtfs.open('trips.txt', 'r')))
 	header = trips_c.next()
 	route_id_col = header.index('route_id')
 	shape_id_col = header.index('shape_id')
@@ -184,7 +181,7 @@ def gtfs_routes(gtfs, output_f):
 	output_layer.crs = geojson.crs.Named('urn:ogc:def:crs:OGC:1.3:CRS84')
 
 	# now we have all the shapes available, translate the routes
-	routes_c = csv.reader(gtfs.open('routes.txt', 'r'))
+	routes_c = csv.reader(swallow_windows_unicode(gtfs.open('routes.txt', 'r')))
 	header = routes_c.next()
 	route_id_col = header.index('route_id')
 
@@ -195,11 +192,12 @@ def gtfs_routes(gtfs, output_f):
 			if row[i] != '':
 				props[h] = row[i]
 
-		try:
-			props['shape_id'] = trips[row[route_id_col]]
-		except KeyError:
-			print 'invalid route_id with missing shape = %r' % (row[route_id_col],)
+		if row[route_id_col] not in trips:
+			# Route has no trips!
+			print "Warning: route has no trips, skipping: %r" % (row,)
 			continue
+
+		props['shape_id'] = trips[row[route_id_col]]
 		props['shape_refs'] = trips_ref[row[route_id_col]][props['shape_id']]
 		if shape_dist_col is not None:
 			props['shape_length'] = shape_lengths[props['shape_id']]
@@ -217,6 +215,33 @@ def gtfs_routes(gtfs, output_f):
 	geojson.dump(output_layer, output_f)
 
 
+def swallow_windows_unicode(fileobj, rewind=True):
+	"""
+	Windows programs (specifically, Notepad) puts '\xef\xbb\xbf' at the start of
+	a Unicode text file.  This is used to handle "utf-8-sig" files.
+
+	This function looks for those bytes and advances the stream past them if
+	they are present.
+
+	Returns fileobj, fast-forwarded past the characters.
+	"""
+	if rewind:
+		pos = fileobj.tell()
+
+	try:
+		bom = fileobj.read(3)
+	except:
+		# End of file, revert!
+		fileobj.seek(pos)
+	if bom == '\xef\xbb\xbf':
+		return fileobj
+
+	# Bytes not present, rewind the stream
+	if rewind:
+		fileobj.seek(pos)
+	return fileobj
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	
@@ -230,7 +255,7 @@ def main():
 		type=argparse.FileType('rb'),
 		help='Path to GTFS ZIP file to extract data from.')
 	
-	group = parser.add_mutually_exclusive_group()
+	group = parser.add_mutually_exclusive_group(required=True)
 	
 	group.add_argument('-r', '--routes',
 		action='store_true',
