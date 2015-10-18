@@ -8,6 +8,10 @@ License: 3-clause BSD, see COPYING
 """
 
 import geojson, argparse, csv, zipfile
+try:
+	from cStringIO import StringIO
+except ImportError:
+	from StringIO import StringIO
 from datetime import timedelta
 from decimal import Decimal
 
@@ -226,7 +230,10 @@ def swallow_windows_unicode(fileobj, rewind=True):
 	Returns fileobj, fast-forwarded past the characters.
 	"""
 	if rewind:
-		pos = fileobj.tell()
+		try:
+			pos = fileobj.tell()
+		except:
+			pos = None
 
 	try:
 		bom = fileobj.read(3)
@@ -238,7 +245,11 @@ def swallow_windows_unicode(fileobj, rewind=True):
 
 	# Bytes not present, rewind the stream
 	if rewind:
-		fileobj.seek(pos)
+		if pos is None:
+			# .tell is not supported, dump the file contents into a cStringID
+			fileobj = StringIO(bom + fileobj.read())
+		else:
+			fileobj.seek(pos)
 	return fileobj
 
 
