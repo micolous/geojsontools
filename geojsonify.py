@@ -13,7 +13,7 @@ License: 3-clause BSD, see COPYING
 import geojson, geojson.crs, argparse, simplejson, io, sys, uuid
 from decimal import Decimal
 
-def geojsonifyme(input_f, output_f):
+def geojsonifyme(input_f, output_f, force_lat_factor=None, force_lon_factor=None):
 	input_obj = simplejson.load(input_f, use_decimal=True)
 	output_layer = geojson.FeatureCollection([])
 	# assume WGS84 CRS
@@ -44,14 +44,21 @@ def geojsonifyme(input_f, output_f):
 
 	# we have some candidates, lets find out if they're raw or scientific notation
 	lat_factor = long_factor = 1
-	if 'E' in lat_key:
-		# this is a scientific, parse it
-		lat_factor = lat_key.split('E', 2)[1]
+	if 'E' in lat_key or force_lat_factor is not None:
+		if force_lat_factor is not None:
+			lat_factor = force_lat_factor
+		else:
+			# this is a scientific, parse it
+			lat_factor = lat_key.split('E', 2)[1]
 		lat_factor = 10 ** int(lat_factor)
 
-	if 'E' in long_key:
-		# this is a factorial, parse it
-		long_factor = lat_key.split('E', 2)[1]
+	if 'E' in long_key or force_lon_factor is not None:
+		if force_lon_factor is not None:
+			long_factor = force_lon_factor
+		else:
+			# this is a factorial, parse it
+			long_factor = lat_key.split('E', 2)[1]
+
 		long_factor = 10 ** int(long_factor)
 
 	# we have some factors, lets parse the rest of this stuff
@@ -94,6 +101,11 @@ def main():
 	parser.add_argument('input', nargs=1, help='Input JSON file')
 	parser.add_argument('-o', '--output', required=True, type=argparse.FileType('wb'), help='Output GeoJSON file')
 
+	parser.add_argument('-t', '--force-lat-factor', type=int
+		help='Force a particular latitude factor')
+	parser.add_argument('-n', '--force-lon-factor', type=int,
+		help='Force a particular longitude factor')
+
 	options = parser.parse_args()
 
 	# Files written by Windows sometimes have Unicode BOMs which
@@ -102,7 +114,7 @@ def main():
 
 	# We don't care so much about the encoding output, we always
 	# use utf-8 with no BOM.
-	geojsonifyme(input_f, options.output)
+	geojsonifyme(input_f, options.output, options.force_lat_factor, options.force_lon_factor)
 
 
 if __name__ == '__main__':
